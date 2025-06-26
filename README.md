@@ -51,6 +51,7 @@ My development philosophy centers on crafting clean, maintainable code with a fo
 
 ## Project Structure
 
+```bash
 ├── public/                # Static assets
 ├── src/                   # Source code
 │   ├── components/        # React components (Skills.tsx, About.tsx, Projects.tsx, etc.)
@@ -60,7 +61,9 @@ My development philosophy centers on crafting clean, maintainable code with a fo
 ├── .prettierrc            # Prettier configuration
 ├── vite.config.ts         # Vite configuration
 ├── package.json           # Dependencies and scripts
+├── vercel.json            # Configureation to stop 404s on direct navigation
 └── README.md              # Project documentation
+```
 
 ## Contributing
 
