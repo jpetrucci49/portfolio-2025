@@ -46,7 +46,7 @@ const skillCategories: SkillCategory[] = [
     skills: [
       {
         name: 'React',
-        years: 5,
+        years: 7,
         icon: <FaReact className="text-blue-600" />,
         description:
           'Built dynamic SPAs with component-based architecture and state management.',
@@ -65,20 +65,20 @@ const skillCategories: SkillCategory[] = [
       },
       {
         name: 'TypeScript',
-        years: 5,
+        years: 7,
         icon: <SiTypescript className="text-blue-800" />,
         description:
           'Enhanced code reliability with static typing in React projects.',
       },
       {
         name: 'HTML5',
-        years: 8,
+        years: 9,
         icon: <SiHtml5 className="text-orange-600" />,
         description: 'Crafted semantic, accessible web structures.',
       },
       {
         name: 'CSS3',
-        years: 8,
+        years: 9,
         icon: <SiCss3 className="text-blue-500" />,
         description: 'Styled responsive, cross-browser layouts.',
       },
@@ -108,26 +108,26 @@ const skillCategories: SkillCategory[] = [
       },
       {
         name: 'jQuery',
-        years: 5,
+        years: 8,
         icon: <SiJquery className="text-blue-700" />,
         description: 'Simplified DOM manipulation and event handling.',
       },
       {
         name: 'AJAX',
-        years: 5,
+        years: 7,
         icon: <SiJavascript className="text-yellow-500" />,
         description: 'Enabled asynchronous data fetching for dynamic UIs.',
       },
       {
         name: 'JSON',
-        years: 6,
+        years: 7,
         icon: <SiJavascript className="text-yellow-500" />,
         description:
           'Structured data for APIs and client-server communication.',
       },
       {
         name: 'XML',
-        years: 4,
+        years: 2,
         icon: <SiJavascript className="text-gray-600" />,
         description: 'Handled structured data for legacy systems.',
       },
@@ -139,13 +139,13 @@ const skillCategories: SkillCategory[] = [
     skills: [
       {
         name: 'Ruby',
-        years: 4,
+        years: 2,
         icon: <SiRuby className="text-red-600" />,
         description: 'Developed robust backend logic with Ruby.',
       },
       {
         name: 'RoR',
-        years: 4,
+        years: 2,
         icon: <SiRuby className="text-red-600" />,
         description: 'Built scalable web apps with Ruby on Rails.',
       },
@@ -157,20 +157,20 @@ const skillCategories: SkillCategory[] = [
       },
       {
         name: 'REST APIs',
-        years: 6,
+        years: 7,
         icon: <FaNodeJs className="text-green-600" />,
         description:
           'Designed and consumed RESTful APIs for seamless integration.',
       },
       {
         name: 'Node.js',
-        years: 6,
+        years: 7,
         icon: <FaNodeJs className="text-green-600" />,
         description: 'Developed server-side logic with Node.js.',
       },
       {
         name: 'Express.js',
-        years: 4,
+        years: 5,
         icon: <FaNodeJs className="text-green-600" />,
         description: 'Built fast, minimalist APIs with Express.',
       },
@@ -248,7 +248,7 @@ const skillCategories: SkillCategory[] = [
       },
       {
         name: 'Git/GitHub',
-        years: 6,
+        years: 7,
         icon: <SiGit className="text-orange-600" />,
         description: 'Managed version control and collaboration.',
       },
