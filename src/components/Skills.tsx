@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Modal from 'react-modal';
 import { FaReact, FaNodeJs, FaDatabase, FaTools } from 'react-icons/fa';
 import {
@@ -262,6 +262,7 @@ const Skills: React.FC = () => {
   );
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   const toggleCategory = (category: string) => {
     setOpenCategories(prev =>
@@ -281,57 +282,92 @@ const Skills: React.FC = () => {
     setSelectedSkill(null);
   };
 
+  const filteredCategories = skillCategories
+    .map(category => ({
+      ...category,
+      skills: category.skills.filter(
+        skill =>
+          skill.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          category.name.toLowerCase().includes(searchQuery.toLowerCase())
+      ),
+    }))
+    .filter(
+      category =>
+        category.skills.length > 0 ||
+        category.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
   return (
     <section className="container bg-white p-8 rounded-lg shadow-md my-10">
       <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
         Skills
       </h2>
+      <div className="mb-6">
+        <input
+          type="text"
+          placeholder="Search skills or categories..."
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[--color-primary]"
+          aria-label="Search skills or categories"
+        />
+      </div>
       <div className="space-y-4">
-        {skillCategories.map(category => (
-          <div
-            key={category.name}
-            className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200"
-          >
-            <button
-              onClick={() => toggleCategory(category.name)}
-              className="text-xl font-semibold text-[--color-primary] w-full text-left flex items-center gap-2 py-2 px-3 rounded hover:bg-gray-50"
-              aria-expanded={openCategories.includes(category.name)}
-            >
-              {category.icon}
-              {category.name}
-            </button>
+        <AnimatePresence>
+          {filteredCategories.map(category => (
             <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{
-                height: openCategories.includes(category.name) ? 'auto' : 0,
-                opacity: openCategories.includes(category.name) ? 1 : 0,
-              }}
-              exit={{ height: 0, opacity: 0 }}
+              key={category.name}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3, ease: 'easeInOut' }}
-              className="overflow-hidden"
+              className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200"
             >
-              <ul className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-3">
-                {category.skills.map(skill => (
-                  <li
-                    key={skill.name}
-                    className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-gray-800 hover:scale-105 hover:shadow-md transition-all duration-200 cursor-pointer"
-                    onClick={() => openModal(skill)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={e => e.key === 'Enter' && openModal(skill)}
-                    aria-label={`View details for ${skill.name}`}
-                  >
-                    {skill.icon}
-                    <span>{skill.name}</span>
-                    <span className="text-sm text-gray-500">
-                      ({skill.years} yrs)
-                    </span>
-                  </li>
-                ))}
-              </ul>
+              <button
+                onClick={() => toggleCategory(category.name)}
+                className="text-xl font-semibold text-[--color-primary] w-full text-left flex items-center gap-2 py-2 px-3 rounded hover:bg-gray-50"
+                aria-expanded={openCategories.includes(category.name)}
+              >
+                {category.icon}
+                {category.name}
+              </button>
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{
+                  height: openCategories.includes(category.name) ? 'auto' : 0,
+                  opacity: openCategories.includes(category.name) ? 1 : 0,
+                }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
+                className="overflow-hidden"
+              >
+                <ul className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-3">
+                  {category.skills.map(skill => (
+                    <motion.li
+                      key={skill.name}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      transition={{ duration: 0.2 }}
+                      className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-gray-800 hover:scale-105 hover:shadow-md transition-all duration-200 cursor-pointer"
+                      onClick={() => openModal(skill)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={e => e.key === 'Enter' && openModal(skill)}
+                      aria-label={`View details for ${skill.name}`}
+                    >
+                      {skill.icon}
+                      <span>{skill.name}</span>
+                      <span className="text-sm text-gray-500">
+                        ({skill.years} yrs)
+                      </span>
+                    </motion.li>
+                  ))}
+                </ul>
+              </motion.div>
             </motion.div>
-          </div>
-        ))}
+          ))}
+        </AnimatePresence>
       </div>
       <Modal
         isOpen={modalIsOpen}
