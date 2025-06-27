@@ -98,7 +98,7 @@ const Projects: React.FC = () => {
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
         className="bg-white p-8 rounded-lg max-w-2xl mx-auto mt-20 outline-none"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+        overlayClassName="fixed inset-0 bg-gray-800/30 backdrop-blur-sm flex items-center justify-center"
         aria={{
           labelledby: 'modal-heading',
           describedby: 'modal-description',
