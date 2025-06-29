@@ -3,8 +3,7 @@ import { FaCode, FaCodeBranch } from 'react-icons/fa';
 import { useGitHubActivities } from '../../hooks/useGitHubActivities';
 
 const RecentActivity: React.FC = () => {
-  const { activities, isLoading, error, fetchMore, retry, hasMore } =
-    useGitHubActivities();
+  const { activities, isLoading, error, retry } = useGitHubActivities();
 
   return (
     <div className="space-y-8 mt-10">
@@ -16,7 +15,7 @@ const RecentActivity: React.FC = () => {
       </h3>
       {activities.length > 0 && (
         <p className="text-gray-600 text-center text-sm" aria-live="polite">
-          Showing {activities.length} of up to 6 activities
+          Showing {activities.length} contributions
         </p>
       )}
       <div aria-busy={isLoading} aria-live="polite">
@@ -26,7 +25,7 @@ const RecentActivity: React.FC = () => {
             <button
               onClick={retry}
               className="px-6 py-2 rounded-md text-white font-semibold bg-[--color-primary] shadow-sm hover:bg-blue-600 hover:shadow-md hover:scale-105 transition-all"
-              aria-label="Retry loading activities"
+              aria-label="Retry loading contributions"
             >
               Retry
             </button>
@@ -34,13 +33,16 @@ const RecentActivity: React.FC = () => {
         ) : activities.length > 0 ? (
           <ul className="space-y-4" aria-labelledby="activity-heading">
             <AnimatePresence initial={false}>
-              {activities.map(activity => (
+              {activities.map((activity, index) => (
                 <motion.li
                   key={activity.id}
                   initial={{ opacity: 0, y: 50 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -50 }}
-                  transition={{ duration: 0.4, ease: 'easeInOut' }}
+                  transition={{
+                    duration: 0.4,
+                    ease: 'easeInOut',
+                    delay: index * 0.1,
+                  }}
                   className="bg-white rounded-lg shadow-sm hover:shadow-md p-4 border border-gray-100 transition-shadow"
                   role="listitem"
                 >
@@ -85,7 +87,7 @@ const RecentActivity: React.FC = () => {
             </AnimatePresence>
           </ul>
         ) : isLoading ? (
-          <ul className="space-y-4" aria-label="Loading recent activity">
+          <ul className="space-y-4" aria-label="Loading recent contributions">
             {[1, 2, 3].map(index => (
               <li
                 key={index}
@@ -110,30 +112,10 @@ const RecentActivity: React.FC = () => {
           </ul>
         ) : (
           <p className="text-gray-600 text-center">
-            No activities available. Check back for updates!
+            No contributions available. Check back for updates!
           </p>
         )}
       </div>
-      {activities.length < 6 && hasMore && !isLoading && (
-        <div className="flex justify-center items-center h-16">
-          <button
-            onClick={fetchMore}
-            disabled={isLoading || !hasMore}
-            className="px-10 py-4 rounded-md text-white text-lg font-semibold bg-gradient-to-r from-[--color-primary] to-blue-700 shadow-md hover:shadow-lg hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-800 hover:scale-110 border border-blue-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label="Load more activities"
-          >
-            {isLoading ? (
-              <motion.div
-                className="w-6 h-6 border-4 border-t-4 border-gray-200 border-t-white rounded-full inline-block"
-                animate={{ rotate: [0, 360] }}
-                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-              />
-            ) : (
-              'Load More'
-            )}
-          </button>
-        </div>
-      )}
       <div className="text-center mt-6">
         <a
           href="https://github.com/jpetrucci49?tab=repositories"

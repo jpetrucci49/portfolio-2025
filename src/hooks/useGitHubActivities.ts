@@ -5,20 +5,16 @@ interface UseGitHubActivitiesResult {
   activities: Activity[];
   isLoading: boolean;
   error: string | null;
-  fetchMore: () => void;
   retry: () => void;
-  hasMore: boolean;
 }
 
 export const useGitHubActivities = (): UseGitHubActivitiesResult => {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const hasFetchedInitialRef = useRef<boolean>(false);
-  const nextPageRef = useRef<number>(1);
+  const hasFetchedRef = useRef<boolean>(false);
   const fetchIndexRef = useRef<number>(0);
-  const hasMoreRef = useRef<boolean>(true);
-  const cachedEventsRef = useRef<Map<number, GitHubEvent[]>>(new Map());
+  const pageRef = useRef<number>(1);
 
   const summarizeDescription = useCallback(
     (type: string, event: GitHubEvent) => {
@@ -27,12 +23,12 @@ export const useGitHubActivities = (): UseGitHubActivitiesResult => {
         type === 'PullRequest'
           ? event.payload.pull_request?.title || 'Contributed to project'
           : event.payload.commits?.[0]?.message || 'Code enhancements';
-      const lowerText = text.toLowerCase();
       const branch = event.payload.ref?.split('refs/heads/')[1] || 'main';
       const prNumber = event.payload.pull_request?.number;
       const prState =
         event.payload.action || event.payload.pull_request?.state || 'opened';
       const commitCount = event.payload.commits?.length || 1;
+      const lowerText = text.toLowerCase();
       let action = 'Updated';
       if (lowerText.includes('fix') || lowerText.includes('bug'))
         action = 'Fixed issues in';
@@ -69,31 +65,23 @@ export const useGitHubActivities = (): UseGitHubActivitiesResult => {
     []
   );
 
-  const fetchActivities = useCallback(
-    async (pageNum: number) => {
-      if (
-        isLoading ||
-        !hasMoreRef.current ||
-        activities.length >= 6 ||
-        pageNum > 3
-      ) {
-        if (import.meta.env.DEV) {
-          console.log('Fetch skipped:', {
-            isLoading,
-            hasMore: hasMoreRef.current,
-            activitiesLength: activities.length,
-            pageNum,
-          });
-        }
-        return [];
-      }
+  const getEventWeight = useCallback((event: GitHubEvent): number => {
+    if (event.type === 'PullRequestEvent') {
+      return event.payload.action === 'merged' ||
+        event.payload.pull_request?.state === 'merged'
+        ? 3
+        : 2;
+    }
+    if (event.type === 'PushEvent') {
+      return (event.payload.commits?.length || 1) > 1 ? 2 : 1;
+    }
+    return 1;
+  }, []);
 
-      // Check cache first
-      if (cachedEventsRef.current.has(pageNum)) {
-        if (import.meta.env.DEV) {
-          console.log('Using cached events for page:', pageNum);
-        }
-        return cachedEventsRef.current.get(pageNum)!;
+  const fetchActivities = useCallback(
+    async (page: number, accumulatedEvents: GitHubEvent[] = []) => {
+      if (isLoading || hasFetchedRef.current) {
+        return accumulatedEvents;
       }
 
       if (!import.meta.env.VITE_GITHUB_TOKEN) {
@@ -102,14 +90,13 @@ export const useGitHubActivities = (): UseGitHubActivitiesResult => {
           'GitHub token missing. Please configure VITE_GITHUB_TOKEN in your environment.'
         );
         setIsLoading(false);
-        hasMoreRef.current = false;
-        return [];
+        return accumulatedEvents;
       }
 
       try {
         setIsLoading(true);
         const response = await fetch(
-          `https://api.github.com/users/jpetrucci49/events?page=${pageNum}&per_page=10`,
+          `https://api.github.com/users/jpetrucci49/events?page=${page}&per_page=30`,
           {
             headers: {
               Authorization: `Bearer ${import.meta.env.VITE_GITHUB_TOKEN}`,
@@ -131,35 +118,36 @@ export const useGitHubActivities = (): UseGitHubActivitiesResult => {
           );
         }
         const data: GitHubEvent[] = await response.json();
-        if (import.meta.env.DEV) {
-          console.log('Fetched events:', data.length, 'for page:', pageNum);
+        const filteredEvents = data.filter(
+          event =>
+            (event.type === 'PushEvent' || event.type === 'PullRequestEvent') &&
+            !(
+              event.payload.commits?.[0]?.message
+                .toLowerCase()
+                .includes('readme') ||
+              event.payload.pull_request?.title
+                ?.toLowerCase()
+                .includes('readme')
+            )
+        );
+        const newAccumulatedEvents = [...accumulatedEvents, ...filteredEvents]
+          .sort((a, b) => {
+            const weightA = getEventWeight(a);
+            const weightB = getEventWeight(b);
+            if (weightA !== weightB) return weightB - weightA;
+            return (
+              new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime()
+            );
+          })
+          .slice(0, 6);
+
+        if (newAccumulatedEvents.length < 6 && page < 3 && data.length > 0) {
+          pageRef.current = page + 1;
+          return await fetchActivities(page + 1, newAccumulatedEvents);
         }
 
-        const filteredEvents = data
-          .filter(
-            event =>
-              (event.type === 'PushEvent' ||
-                event.type === 'PullRequestEvent') &&
-              !(
-                event.payload.commits?.[0]?.message
-                  .toLowerCase()
-                  .includes('readme') ||
-                event.payload.pull_request?.title
-                  ?.toLowerCase()
-                  .includes('readme')
-              )
-          )
-          .slice(0, 3);
-        if (import.meta.env.DEV) {
-          console.log(
-            'Filtered events:',
-            filteredEvents.length,
-            'for page:',
-            pageNum
-          );
-        }
-
-        const formattedActivities = filteredEvents
+        const formattedActivities = newAccumulatedEvents
           .map(event => {
             const uniqueId = `${event.id}-${event.repo.name}-${
               event.created_at
@@ -191,36 +179,11 @@ export const useGitHubActivities = (): UseGitHubActivitiesResult => {
                   a.date === activity.date
               )
           );
-        if (import.meta.env.DEV) {
-          console.log(
-            'Formatted activities:',
-            formattedActivities.length,
-            'for page:',
-            pageNum
-          );
-        }
 
-        setActivities(prevActivities => {
-          const newActivities =
-            pageNum === 1
-              ? formattedActivities
-              : [...prevActivities, ...formattedActivities].slice(0, 6);
-          hasMoreRef.current = pageNum < 3 && newActivities.length < 6;
-          if (import.meta.env.DEV) {
-            console.log(
-              'Updated activities:',
-              newActivities.length,
-              'hasMore:',
-              hasMoreRef.current,
-              'pageNum:',
-              pageNum
-            );
-          }
-          return newActivities;
-        });
+        setActivities(formattedActivities);
         setError(null);
-        cachedEventsRef.current.set(pageNum, filteredEvents);
-        return filteredEvents;
+        hasFetchedRef.current = true;
+        return newAccumulatedEvents;
       } catch (err) {
         if (err instanceof Error) {
           console.error('Error fetching GitHub events:', err.message);
@@ -229,58 +192,27 @@ export const useGitHubActivities = (): UseGitHubActivitiesResult => {
           console.error('Unknown error fetching GitHub events:', err);
           setError('An unexpected error occurred. Please try again later.');
         }
-        hasMoreRef.current = false;
-        return [];
+        return accumulatedEvents;
       } finally {
         setIsLoading(false);
       }
     },
-    [summarizeDescription, isLoading, activities.length]
+    [summarizeDescription, isLoading, getEventWeight]
   );
 
   useEffect(() => {
-    if (!hasFetchedInitialRef.current) {
-      if (import.meta.env.DEV) {
-        console.log('Triggering initial fetch for page 1');
-      }
+    if (!hasFetchedRef.current) {
       fetchActivities(1);
-      hasFetchedInitialRef.current = true;
     }
   }, [fetchActivities]);
 
-  const fetchMore = () => {
-    if (nextPageRef.current === 1) {
-      if (import.meta.env.DEV) {
-        console.log('Load More clicked, fetching page 2');
-      }
-      fetchActivities(2);
-      nextPageRef.current = 2;
-    } else if (nextPageRef.current === 2) {
-      if (import.meta.env.DEV) {
-        console.log('Load More clicked, fetching page 3');
-      }
-      fetchActivities(3);
-      nextPageRef.current = 3;
-    }
-  };
-
   const retry = () => {
-    if (import.meta.env.DEV) {
-      console.log('Retry triggered, resetting state');
-    }
     setError(null);
-    hasMoreRef.current = true;
-    nextPageRef.current = 1;
-    cachedEventsRef.current.clear();
+    setActivities([]);
+    hasFetchedRef.current = false;
+    pageRef.current = 1;
     fetchActivities(1);
   };
 
-  return {
-    activities,
-    isLoading,
-    error,
-    fetchMore,
-    retry,
-    hasMore: hasMoreRef.current,
-  };
+  return { activities, isLoading, error, retry };
 };
