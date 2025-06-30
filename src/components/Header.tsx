@@ -27,6 +27,11 @@ const Header: React.FC = () => {
             </NavLink>
           </li>
           <li>
+            <NavLink to="/resume" className={isActiveCB}>
+              Resume
+            </NavLink>
+          </li>
+          <li>
             <NavLink to="/contact" className={isActiveCB}>
               Contact
             </NavLink>

@@ -6,6 +6,7 @@ import Projects from './components/Projects';
 import Skills from './components/Skills';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
+import Resume from './components/resume/Resume';
 
 const AnimatedRoutes: React.FC = () => {
   const location = useLocation();
@@ -62,6 +63,19 @@ const AnimatedRoutes: React.FC = () => {
               transition={{ duration: 0.3, ease: 'easeInOut' }}
             >
               <Contact />
+            </motion.div>
+          }
+        />
+        <Route
+          path="/resume"
+          element={
+            <motion.div
+              initial={{ opacity: 0, y: 30, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -30, scale: 0.98 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+            >
+              <Resume />
             </motion.div>
           }
         />

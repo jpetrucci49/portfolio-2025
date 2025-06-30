@@ -1,0 +1,51 @@
+{
+  "experience": [
+    {
+      "title": "Founder",
+      "company": "Pyyre Media LLC",
+      "startDate": "08/2022",
+      "endDate": "03/2025",
+      "description": "Conceptualized and planned the https://pyyre.com platform, outlining key features and strategies."
+    },
+    {
+      "title": "Software Engineer",
+      "company": "F1V LLC",
+      "startDate": "04/2019",
+      "endDate": "07/2022",
+      "description": "Evaluated software development project plans and recommended adjustments."
+    },
+    {
+      "title": "Frontend Developer",
+      "company": "UPromise INC",
+      "startDate": "02/2007",
+      "endDate": "06/2008",
+      "description": "Developed HTML Emails for marketing email communications."
+    },
+    {
+      "title": "Junior Developer",
+      "company": "Monitor Group",
+      "startDate": "07/2005",
+      "endDate": "05/2006",
+      "description": "Developed advanced skills in breaking down XML code and templates."
+    }
+  ],
+  "education": [
+    {
+      "degree": "Web Development Immersive Graduate",
+      "institution": "General Assembly",
+      "startDate": "07/2018",
+      "endDate": "10/2018"
+    },
+    {
+      "degree": "Web Production Training",
+      "institution": "Year Up",
+      "startDate": "02/2005",
+      "endDate": "02/2006"
+    }
+  ],
+  "skills": ["React", "TypeScript", "JavaScript", "HTML/CSS", "Tailwind CSS", "Git"],
+  "contact": {
+    "email": "jpetrucci49@example.com",
+    "linkedin": "https://linkedin.com/in/jpetrucci49"
+  }
+}
