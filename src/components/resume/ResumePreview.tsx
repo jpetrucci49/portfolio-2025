@@ -14,7 +14,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ resume }) => (
       className="bg-white rounded-lg shadow-sm p-6 border border-gray-200"
     >
       <h3 className="text-xl font-semibold text-[--color-primary] mb-4">
-        Experience
+        Professional Coding Experience
       </h3>
       {resume.experience.map((exp, index) => (
         <div key={index} className="mb-4 last:mb-0">
@@ -24,7 +24,13 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ resume }) => (
           <p className="text-sm text-gray-500">
             {exp.startDate} - {exp.endDate || 'Present'}
           </p>
-          <p className="text-gray-600">{exp.description}</p>
+          <ul className="list-disc pl-5 mt-2 text-gray-600">
+            {exp.description.map((desc, idx) => (
+              <li key={idx} className="text-gray-600">
+                {desc}
+              </li>
+            ))}
+          </ul>
         </div>
       ))}
     </motion.section>
@@ -69,7 +75,24 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ resume }) => (
     <motion.section
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.4 }}
+      transition={{ duration: 0.4, delay: 0.5 }}
+      className="bg-white rounded-lg shadow-sm p-6 border border-gray-200"
+    >
+      <h3 className="text-xl font-semibold text-[--color-primary] mb-4">
+        Projects
+      </h3>
+      {resume.projects?.map((project, index) => (
+        <div key={index} className="mb-4 last:mb-0">
+          <h4 className="text-lg font-medium text-gray-800">{project.title}</h4>
+          <p className="text-sm text-gray-600">{project.description}</p>
+          <p className="text-sm text-gray-500">{project.date}</p>
+        </div>
+      ))}
+    </motion.section>
+    <motion.section
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.6 }}
       className="bg-white rounded-lg shadow-sm p-6 border border-gray-200"
     >
       <h3 className="text-xl font-semibold text-[--color-primary] mb-4">

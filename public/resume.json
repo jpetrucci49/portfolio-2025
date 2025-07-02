@@ -5,28 +5,48 @@
       "company": "Pyyre Media LLC",
       "startDate": "08/2022",
       "endDate": "03/2025",
-      "description": "Conceptualized and planned the https://pyyre.com platform, outlining key features and strategies."
+      "description": [
+        "Conceptualized and planned the https://pyyre.com platform, outlining key features and strategies.",
+        "Oversaw the planning and design phases, collaborating with the team to form plans and user-centric designs.",
+        "Initiated and managed the development process, guiding the team through to the delivery of our prototype.",
+        "Faced challenges with determination, adapting and pushing forward with resilience."
+      ]
     },
     {
       "title": "Software Engineer",
       "company": "F1V LLC",
       "startDate": "04/2019",
       "endDate": "07/2022",
-      "description": "Evaluated software development project plans and recommended adjustments."
+      "description": [
+        "Evaluated software development project plans and recommended adjustments.",
+        "Collaborated with product and engineering team members to define and develop new features.",
+        "Instrumented and modified unit and integration tests to improve software quality and reliability.",
+        "Implemented and tested enhancement requests to improve functionality and extend performance."
+      ]
     },
     {
       "title": "Frontend Developer",
       "company": "UPromise INC",
       "startDate": "02/2007",
       "endDate": "06/2008",
-      "description": "Developed HTML Emails for marketing email communications."
+      "description": [
+        "Developed HTML Emails for marketing email communications.",
+        "Interviewed, assisted and trained other developers in the development process.",
+        "Maintained the email development environment inside Vignette and Perforce version control.",
+        "Worked with campaign owners, QA leads and other technical teams to launch accurate and timely email campaigns."
+      ]
     },
     {
       "title": "Junior Developer",
       "company": "Monitor Group",
       "startDate": "07/2005",
       "endDate": "05/2006",
-      "description": "Developed advanced skills in breaking down XML code and templates."
+      "description": [
+        "Developed advanced skills in breaking down XML code and templates.",
+        "Increased understanding in the importance in time management when managing multiple tasks.",
+        "Identified templates that needed revisions and executed appropriate updates.",
+        "Analyzed and extended XML schema with the Data Architect and Database Administrator."
+      ]
     }
   ],
   "education": [
@@ -43,9 +63,48 @@
       "endDate": "02/2006"
     }
   ],
-  "skills": ["React", "TypeScript", "JavaScript", "HTML/CSS", "Tailwind CSS", "Git"],
+  "skills": [
+    "React",
+    "Redux",
+    "Jest/Puppeteer",
+    "HTML",
+    "XML",
+    "CSS",
+    "JavaScript",
+    "AJAX",
+    "SASS",
+    "TypeScript",
+    "Node.js",
+    "Ruby",
+    "jQuery",
+    "Express.js",
+    "Rails",
+    "Bootstrap",
+    "AWS",
+    "Git/GitHub",
+    "SQL",
+    "PostgreSQL",
+    "MongoDB"
+  ],
+  "projects": [
+    {
+      "title": "Personal Portfolio",
+      "description": "Developed a responsive portfolio site using React, TypeScript, and Tailwind CSS to showcase projects and skills.",
+      "date": "06/2025"
+    },
+    {
+      "title": "Task Management App",
+      "description": "Built a full-stack app with React, Node.js, and MongoDB for task tracking and team collaboration.",
+      "date": "05/2025"
+    },
+    {
+      "title": "API Explorer",
+      "description": "Developed a tool for testing and exploring REST APIs with React and TypeScript, featuring real-time response visualization.",
+      "date": "04/2025"
+    }
+  ],
   "contact": {
-    "email": "jpetrucci49@example.com",
+    "email": "joseph.petrucci49@gmail.com",
     "linkedin": "https://linkedin.com/in/jpetrucci49"
   }
 }

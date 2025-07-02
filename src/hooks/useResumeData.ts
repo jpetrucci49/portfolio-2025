@@ -15,18 +15,10 @@ export const useResumeData = (): UseResumeDataResult => {
   const hasFetchedRef = useRef<boolean>(false);
 
   const fetchResume = useCallback(async () => {
-    if (isLoading || hasFetchedRef.current) {
-      if (import.meta.env.DEV) {
-        console.log('Skipping fetch: already loading or fetched');
-      }
-      return;
-    }
+    if (isLoading || hasFetchedRef.current) return;
 
     try {
       setIsLoading(true);
-      if (import.meta.env.DEV) {
-        console.log('Starting fetch for resume data from /resume.json');
-      }
       const response = await fetch('/resume.json');
       if (!response.ok) {
         throw new Error(
@@ -34,17 +26,10 @@ export const useResumeData = (): UseResumeDataResult => {
         );
       }
       const data: ResumeType = await response.json();
-      if (import.meta.env.DEV) {
-        console.log('Fetched resume data:', data);
-      }
-
       setResume(data);
       setError(null);
       hasFetchedRef.current = true;
     } catch (err) {
-      if (import.meta.env.DEV) {
-        console.error('Error fetching resume data:', err);
-      }
       if (err instanceof Error) {
         setError(err.message);
       } else {
@@ -52,29 +37,16 @@ export const useResumeData = (): UseResumeDataResult => {
       }
     } finally {
       setIsLoading(false);
-      if (import.meta.env.DEV) {
-        console.log('Fetch complete. State:', {
-          isLoading: false,
-          resume,
-          error,
-        });
-      }
     }
-  }, [isLoading, resume, error]);
+  }, [isLoading]);
 
   useEffect(() => {
     if (!hasFetchedRef.current) {
-      if (import.meta.env.DEV) {
-        console.log('Initiating resume data fetch');
-      }
       fetchResume();
     }
   }, [fetchResume]);
 
   const retry = () => {
-    if (import.meta.env.DEV) {
-      console.log('Retrying fetch for resume data');
-    }
     setError(null);
     setResume(null);
     hasFetchedRef.current = false;

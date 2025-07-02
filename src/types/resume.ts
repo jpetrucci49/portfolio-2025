@@ -4,7 +4,7 @@ export interface ResumeType {
     company: string;
     startDate: string;
     endDate?: string;
-    description: string;
+    description: string[];
   }>;
   education: Array<{
     degree: string;
@@ -13,6 +13,11 @@ export interface ResumeType {
     endDate: string;
   }>;
   skills: string[];
+  projects?: Array<{
+    title: string;
+    description: string;
+    date: string;
+  }>;
   contact: {
     email: string;
     linkedin: string;

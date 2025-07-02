@@ -11,50 +11,199 @@ const Resume: React.FC = () => {
   const generatePDF = () => {
     if (!resume) return;
     try {
-      const doc = new jsPDF();
-      doc.setFontSize(16);
-      doc.text('Resume', 20, 20);
-      doc.setFontSize(12);
-      let yOffset = 30;
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
 
-      doc.text('Experience', 20, yOffset);
-      yOffset += 10;
+      // Colors and fonts
+      const primaryColor: [number, number, number] = [30, 64, 175]; // RGB for blue-700
+      doc.setDrawColor(...primaryColor);
+      doc.setFont('times', 'normal');
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const leftColumnX = 20;
+      const rightColumnX = 110;
+      const margin = 20;
+      let leftYOffset = 20;
+      let rightYOffset = 20;
+
+      // Header: Name and Contact
+      doc.setFontSize(20);
+      doc.setFont('times', 'bold');
+      doc.setTextColor(...primaryColor);
+      doc.text('Joseph Petrucci', pageWidth / 2, leftYOffset, {
+        align: 'center',
+      });
+      leftYOffset += 8;
+      doc.setFontSize(10);
+      doc.setFont('times', 'normal');
+      doc.setTextColor(0, 0, 0);
+      doc.text(resume.contact.email, pageWidth / 2, leftYOffset, {
+        align: 'center',
+      });
+      leftYOffset += 5;
+      doc.text(resume.contact.linkedin, pageWidth / 2, leftYOffset, {
+        align: 'center',
+      });
+      leftYOffset += 5;
+      doc.line(margin, leftYOffset, pageWidth - margin, leftYOffset); // Header line
+      leftYOffset += 7;
+      rightYOffset = leftYOffset; // Align right column with left
+
+      // Left Column: Professional Coding Experience, Education
+      doc.setFontSize(14);
+      doc.setFont('times', 'bold');
+      doc.setTextColor(...primaryColor);
+      doc.text('Professional Dev Experience', leftColumnX, leftYOffset);
+
+      leftYOffset += 3.5;
+      doc.line(leftColumnX, leftYOffset, leftColumnX + 80, leftYOffset);
+      leftYOffset += 5;
+
+      doc.setFontSize(10);
+      doc.setFont('times', 'normal');
+      doc.setTextColor(0, 0, 0);
       resume.experience.forEach(exp => {
-        doc.text(`${exp.title} at ${exp.company}`, 20, yOffset);
+        doc.setFont('times', 'bold');
+        doc.text(`${exp.title} at ${exp.company}`, leftColumnX, leftYOffset);
+        leftYOffset += 4;
+        doc.setFont('times', 'italic');
         doc.text(
           `${exp.startDate} - ${exp.endDate || 'Present'}`,
-          20,
-          yOffset + 5
+          leftColumnX,
+          leftYOffset
         );
-        doc.text(exp.description, 20, yOffset + 10, { maxWidth: 160 });
-        yOffset += 30 + Math.ceil(exp.description.length / 80) * 5;
+        leftYOffset += 5;
+        doc.setFont('times', 'normal');
+        exp.description.forEach((desc: string) => {
+          const descLines = doc.splitTextToSize(desc, 78); // Adjusted for indentation
+          descLines.forEach((line: string, lineIdx: number) => {
+            const xPos =
+              lineIdx === 0 ? leftColumnX + 1.76 : leftColumnX + 3.76; // 5px indent for first line, 7px for wrapped
+            const prefix = lineIdx === 0 ? `• ${line}` : line;
+            doc.text(prefix, xPos, leftYOffset);
+            leftYOffset += 4;
+          });
+        });
+        leftYOffset += 3;
       });
 
-      doc.text('Education', 20, yOffset);
-      yOffset += 10;
+      doc.line(leftColumnX, leftYOffset, leftColumnX + 80, leftYOffset);
+      leftYOffset += 7;
+
+      doc.setFontSize(14);
+      doc.setFont('times', 'bold');
+      doc.setTextColor(...primaryColor);
+      doc.text('Education', leftColumnX, leftYOffset);
+
+      leftYOffset += 3.5;
+      doc.line(leftColumnX, leftYOffset, leftColumnX + 80, leftYOffset);
+      leftYOffset += 5;
+
+      doc.setFontSize(10);
+      doc.setFont('times', 'normal');
+      doc.setTextColor(0, 0, 0);
       resume.education.forEach(edu => {
-        doc.text(`${edu.degree}, ${edu.institution}`, 20, yOffset);
-        doc.text(`${edu.startDate} - ${edu.endDate}`, 20, yOffset + 5);
-        yOffset += 15;
+        doc.setFont('times', 'bold');
+        doc.text(edu.degree, leftColumnX, leftYOffset);
+        leftYOffset += 4;
+        doc.setFont('times', 'italic');
+        doc.text(
+          `${edu.institution}, ${edu.startDate} - ${edu.endDate}`,
+          leftColumnX,
+          leftYOffset
+        );
+        leftYOffset += 6;
       });
 
-      doc.text('Skills', 20, yOffset);
-      yOffset += 10;
-      doc.text(resume.skills.join(', '), 20, yOffset, { maxWidth: 160 });
-      yOffset += 10 + Math.ceil(resume.skills.join(', ').length / 80) * 5;
+      // Right Column: Skills, Certifications, Contact, Projects
+      doc.setFontSize(14);
+      doc.setFont('times', 'bold');
+      doc.setTextColor(...primaryColor);
+      doc.text('Skills', rightColumnX, rightYOffset);
 
-      doc.text('Contact', 20, yOffset);
-      yOffset += 10;
-      doc.text(`Email: ${resume.contact.email}`, 20, yOffset);
-      doc.text(`LinkedIn: ${resume.contact.linkedin}`, 20, yOffset + 5);
+      rightYOffset += 3.5;
+      doc.line(rightColumnX, rightYOffset, rightColumnX + 80, rightYOffset);
+      rightYOffset += 5;
 
-      doc.save('jpetrucci49-resume.pdf');
+      doc.setFontSize(10);
+      doc.setFont('times', 'normal');
+      doc.setTextColor(0, 0, 0);
+      const skills = resume.skills;
+      const colWidth = 25; // 75mm total width for 3 columns
+      for (let row = 0; row < 7; row++) {
+        for (let col = 0; col < 3; col++) {
+          const skillIndex = row * 3 + col;
+          if (skillIndex < skills.length) {
+            const xPos = rightColumnX + col * colWidth;
+            doc.text(skills[skillIndex], xPos, rightYOffset);
+          }
+        }
+        rightYOffset += 5;
+      }
+
+      rightYOffset += 2;
+      doc.line(rightColumnX, rightYOffset, rightColumnX + 80, rightYOffset);
+      rightYOffset += 7;
+
+      doc.setFontSize(14);
+      doc.setFont('times', 'bold');
+      doc.setTextColor(...primaryColor);
+      doc.text('Contact', rightColumnX, rightYOffset);
+
+      rightYOffset += 3.5;
+      doc.line(rightColumnX, rightYOffset, rightColumnX + 80, rightYOffset);
+      rightYOffset += 5;
+
+      doc.setFontSize(10);
+      doc.setFont('times', 'normal');
+      doc.setTextColor(0, 0, 0);
+      doc.text(`Email: ${resume.contact.email}`, rightColumnX, rightYOffset);
+      rightYOffset += 4;
+      doc.text(
+        `LinkedIn: ${resume.contact.linkedin}`,
+        rightColumnX,
+        rightYOffset
+      );
+
+      rightYOffset += 7;
+      doc.line(rightColumnX, rightYOffset, rightColumnX + 80, rightYOffset);
+      rightYOffset += 7;
+
+      doc.setFontSize(14);
+      doc.setFont('times', 'bold');
+      doc.setTextColor(...primaryColor);
+      doc.text('Projects', rightColumnX, rightYOffset);
+
+      rightYOffset += 3.5;
+      doc.line(rightColumnX, rightYOffset, rightColumnX + 80, rightYOffset);
+      rightYOffset += 5;
+
+      doc.setFontSize(10);
+      doc.setFont('times', 'normal');
+      doc.setTextColor(0, 0, 0);
+      resume.projects?.forEach(project => {
+        doc.setFont('times', 'bold');
+        doc.text(project.title, rightColumnX, rightYOffset);
+        rightYOffset += 4;
+        const descLines = doc.splitTextToSize(project.description, 80);
+        descLines.forEach((line: string, lineIdx: number) => {
+          const xPos = lineIdx === 0 ? rightColumnX : rightColumnX + 2;
+          const prefix = lineIdx === 0 ? `• ${line}` : line;
+          doc.text(prefix, xPos, rightYOffset);
+          rightYOffset += 4;
+        });
+        doc.setFont('times', 'italic');
+        doc.text(project.date, rightColumnX, rightYOffset);
+        rightYOffset += 6;
+      });
+
+      doc.save('joseph-petrucci-resume.pdf');
       setDownloadStatus('Resume downloaded successfully!');
       setTimeout(() => setDownloadStatus(''), 3000);
     } catch (err) {
-      if (err instanceof Error) {
-        setDownloadStatus(`Failed to generate PDF: ${err.message}`);
-      }
+      setDownloadStatus(`Failed to generate PDF: ${(err as Error).message}`);
     }
   };
 
@@ -88,7 +237,7 @@ const Resume: React.FC = () => {
             <p className="text-red-600 mb-4">{error}</p>
             <button
               onClick={retry}
-              className="px-6 py-2 rounded-md text-white font-semibold bg-[--color-primary] shadow-sm hover:bg-blue-600 hover:shadow-md hover:scale-105 transition-all"
+              className="px-6 py-2 rounded-md text-white font-semibold bg-blue-700 border border-blue-800 shadow-md hover:bg-blue-800 hover:shadow-lg hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               aria-label="Retry loading resume"
             >
               Retry
